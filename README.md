@@ -333,3 +333,10 @@ It runs a zero-comment source scan, Python byte compilation, and the frontend Ty
 ## License
 
 MIT. See `LICENSE`.
+markdown
+## Built by Team BRYVEN BROTHERS
+- **Makaranth MA** — [@m4k4r4n7h](https://github.com)
+- **Rikshikesh M Sajeev** — [@rishiosinter](https://github.com)
+- **Shweta Sagar Umachagi** — [@shwetasagarumachagi-lgtm](https://github.com)
+- **Yadu Krishna** — [@YADU-KRISHNA23](https://github.com)
+- **Vibhin Rathod** — [@vibhinrathods-creator](https://github.com)
