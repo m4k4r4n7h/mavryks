@@ -7,7 +7,7 @@ MAVRYKS watches a physical floor through a webcam, turns what it sees into a 12 
 ## Built by
 
 - Makaranth MA
-- Rikshikesh
+- Rikshikesh Ms
 - Sagar Rajesh
 - Sai krishna
 - Vibhin Rathod
@@ -340,3 +340,4 @@ markdown
 - **Shweta Sagar Umachagi** — [@shwetasagarumachagi-lgtm](https://github.com)
 - **Yadu Krishna** — [@YADU-KRISHNA23](https://github.com)
 - **Vibhin Rathod** — [@vibhinrathods-creator](https://github.com)
+
