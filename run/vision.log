@@ -1,0 +1,5 @@
+2026-11-26 21:18:28,369 | INFO | mavryks.tracker | Loaded saved calibration (need_ref=False)
+2026-11-26 21:18:28,370 | INFO | mavryks.tracker | Loading YOLO model: yolov8n.pt
+Warning: Ignoring XDG_SESSION_TYPE=wayland on Gnome. Use QT_QPA_PLATFORM=wayland to run on Wayland anyway.
+2026-11-26 21:21:04,652 | INFO | mavryks.tracker | OpenCV window closed by operator
+2026-11-26 21:21:04,663 | INFO | mavryks.tracker | MAVRYKS Tracker shut down cleanly
