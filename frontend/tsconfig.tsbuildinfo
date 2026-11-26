@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/api.ts","./src/main.tsx","./src/types.ts","./src/components/ControlPanel.tsx","./src/components/EventPanel.tsx","./src/components/GridPanel.tsx","./src/components/InstructionPanel.tsx","./src/components/RobotPanel.tsx","./src/components/StatusPanel.tsx","./src/components/TaskPanel.tsx"],"version":"5.9.3"}
