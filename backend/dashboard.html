@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MAVRYKS Control</title>
+<style>
+* { border-radius: 0; box-sizing: border-box; }
+body { background: #E8E8E8; color: #000000; font-family: Arial, Helvetica, sans-serif; font-size: 13px; margin: 0; }
+.bar { background: #FFFFFF; border: 1px solid #808080; font-weight: bold; margin: 12px; padding: 8px 10px; }
+.main { display: grid; gap: 12px; grid-template-columns: auto 340px; margin: 0 12px 12px; }
+.panel { background: #FFFFFF; border: 1px solid #808080; padding: 10px; }
+canvas { background: #FFFFFF; border: 1px solid #808080; display: block; }
+table { border-collapse: collapse; font-family: "Courier New", monospace; font-size: 12px; width: 100%; }
+td, th { border: 1px solid #808080; padding: 4px 6px; text-align: left; }
+th { background: #E8E8E8; }
+button { background: #E8E8E8; border: 1px solid #808080; cursor: pointer; font-family: Arial, Helvetica, sans-serif; font-size: 12px; padding: 5px 8px; }
+button:hover { background: #FFFFFF; }
+.note { font-family: "Courier New", monospace; font-size: 11px; margin-top: 8px; }
+.box { max-height: 180px; overflow: auto; }
+</style>
+</head>
+<body>
+<div class="bar">MAVRYKS PHYSICAL AI WAREHOUSE CONTROL</div>
+<div class="main">
+  <div class="panel">
+    <canvas id="gridCanvas" width="540" height="540"></canvas>
+    <div class="note">LEFT CLICK SET TARGET | SHIFT CLICK APPEND | RIGHT CLICK TOGGLE STATIC OBSTACLE</div>
+  </div>
+  <div class="panel">
+    <h2>OPERATOR PANEL</h2>
+    <table>
+      <tr><th>SOCKET</th><td id="stSocket">DISCONNECTED</td></tr>
+      <tr><th>VISION</th><td id="stVision">OFFLINE</td></tr>
+      <tr><th>ESTOP</th><td id="stEstop">NO</td></tr>
+      <tr><th>SAFETY</th><td id="stSafety">NONE</td></tr>
+      <tr><th>ROBOTS</th><td id="stRobots">0</td></tr>
+      <tr><th>TASKS PENDING</th><td id="stTasks">0</td></tr>
+      <tr><th>DISTANCE</th><td id="stDistance">0</td></tr>
+      <tr><th>ETA</th><td id="stEta">0</td></tr>
+      <tr><th>SOLVE</th><td id="stSolve">0 ms</td></tr>
+    </table>
+    <div style="margin-top:8px;">
+      <button id="btnEstop">ESTOP</button>
+      <button id="btnClearEstop">CLEAR ESTOP</button>
+      <button id="btnClearTargets">CLEAR TARGETS</button>
+      <button id="btnClearZones">CLEAR ZONES</button>
+    </div>
+    <h2 style="margin-top:12px;">DIRECTIONS</h2>
+    <div id="stepsBox" class="box">NO ACTIVE ROUTE</div>
+    <h2 style="margin-top:12px;">EVENTS</h2>
+    <div id="eventsBox" class="box">NONE</div>
+  </div>
+</div>
+<script>
+const canvas = document.getElementById('gridCanvas');
+const ctx = canvas.getContext('2d');
+let state = null;
+let ws = null;
+let row = 0;
+const colors = ['#0033CC', '#008000', '#800080', '#CC6600'];
+
+function connect() {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${proto}//${location.host}/ws/live`);
+  ws.onopen = () => { document.getElementById('stSocket').textContent = 'CONNECTED'; };
+  ws.onclose = () => {
+    document.getElementById('stSocket').textContent = 'DISCONNECTED';
+    setTimeout(connect, 1500);
+  };
+  ws.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.grid) { state = msg; render(); }
+  };
+}
+
+function render() {
+  if (!state) return;
+  const n = state.grid_size || 12;
+  const cell = canvas.width / n;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const stat = new Set((state.static_obstacles || []).map(p => `${p[0]},${p[1]}`));
+  const dyn = new Set((state.dynamic_obstacles || []).map(p => `${p[0]},${p[1]}`));
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      const rv = Math.max(0, Math.min(1, (state.rho[y] && state.rho[y][x]) || 0));
+      const shade = Math.round(255 - 70 * rv);
+      ctx.fillStyle = `rgb(${shade},${shade},${shade})`;
+      ctx.fillRect(x * cell, y * cell, cell, cell);
+      const key = `${x},${y}`;
+      if (stat.has(key)) {
+        ctx.fillStyle = '#808080';
+        ctx.fillRect(x * cell + 2, y * cell + 2, cell - 4, cell - 4);
+      } else if (dyn.has(key)) {
+        ctx.fillStyle = '#C00000';
+        ctx.fillRect(x * cell + 2, y * cell + 2, cell - 4, cell - 4);
+      }
+      ctx.strokeStyle = '#808080';
+      ctx.strokeRect(x * cell, y * cell, cell, cell);
+    }
+  }
+  (state.fleet_routes || []).forEach((fr, idx) => {
+    if (!fr.path || fr.path.length < 2) return;
+    ctx.strokeStyle = colors[idx % colors.length];
+    ctx.lineWidth = 4;
+    ctx.lineJoin = 'miter';
+    ctx.beginPath();
+    fr.path.forEach((p, i) => {
+      const cx = (p[0] + 0.5) * cell;
+      const cy = (p[1] + 0.5) * cell;
+      if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+    });
+    ctx.stroke();
+  });
+  (state.targets || []).forEach((t, idx) => {
+    ctx.fillStyle = '#0033CC';
+    ctx.fillRect((t[0] + 0.2) * cell, (t[1] + 0.2) * cell, cell * 0.6, cell * 0.6);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 12px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(idx + 1), (t[0] + 0.5) * cell, (t[1] + 0.5) * cell);
+  });
+  (state.robots || state.workers || []).forEach((w, idx) => {
+    const cellPt = w.cell || w;
+    ctx.fillStyle = '#000000';
+    ctx.fillRect((cellPt[0] + 0.2) * cell, (cellPt[1] + 0.2) * cell, cell * 0.6, cell * 0.6);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 11px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`R${idx + 1}`, (cellPt[0] + 0.5) * cell, (cellPt[1] + 0.5) * cell);
+  });
+  document.getElementById('stVision').textContent = state.vision && state.vision.online ? `ONLINE ${state.vision.fps} FPS` : 'OFFLINE';
+  document.getElementById('stEstop').textContent = state.estop ? 'YES' : 'NO';
+  document.getElementById('stSafety').textContent = (state.safety && state.safety.alerts || []).join(',') || 'NORMAL';
+  document.getElementById('stRobots').textContent = String((state.robots || []).length);
+  document.getElementById('stTasks').textContent = String((state.task_stats && state.task_stats.pending) || 0);
+  document.getElementById('stDistance').textContent = String(state.distance);
+  document.getElementById('stEta').textContent = `${state.estimated_time_sec} s`;
+  document.getElementById('stSolve').textContent = `${state.metrics.solve_ms} ms`;
+  const steps = state.instructions || [];
+  document.getElementById('stepsBox').innerHTML = steps.length ? steps.map((s, i) => `<div>${i + 1}. ${s.action} ${s.cells} cells ${s.distance_m}m</div>`).join('') : 'NO ACTIVE ROUTE';
+  const events = state.events || [];
+  document.getElementById('eventsBox').innerHTML = events.length ? events.slice(0, 20).map(e => `<div>${e.severity} ${e.message}</div>`).join('') : 'NONE';
+}
+
+function cellFromEvent(e) {
+  const rect = canvas.getBoundingClientRect();
+  const n = (state && state.grid_size) || 12;
+  const x = Math.floor(((e.clientX - rect.left) / rect.width) * n);
+  const y = Math.floor(((e.clientY - rect.top) / rect.height) * n);
+  return [Math.max(0, Math.min(n - 1, x)), Math.max(0, Math.min(n - 1, y))];
+}
+
+function send(obj) {
+  if (ws && ws.readyState === 1) ws.send(JSON.stringify(obj));
+}
+
+canvas.addEventListener('click', (e) => {
+  const [x, y] = cellFromEvent(e);
+  send({ cmd: 'set_target', x, y, append: e.shiftKey });
+});
+canvas.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  const [x, y] = cellFromEvent(e);
+  send({ cmd: 'toggle_static', x, y });
+});
+document.getElementById('btnEstop').onclick = () => send({ cmd: 'estop', active: true });
+document.getElementById('btnClearEstop').onclick = () => send({ cmd: 'estop', active: false });
+document.getElementById('btnClearTargets').onclick = () => send({ cmd: 'clear_targets' });
+document.getElementById('btnClearZones').onclick = () => send({ cmd: 'clear_zones' });
+connect();
+</script>
+</body>
+</html>
