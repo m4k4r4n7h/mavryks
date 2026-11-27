@@ -6,12 +6,11 @@ MAVRYKS watches a physical floor through a webcam, turns what it sees into a 12 
 
 ## Built by
 
-- Makaranth MA
-- Rikshikesh Ms
-- Sagar Rajesh
-- Sai krishna
-- Vibhin Rathod
-- Yadhu krishna
+- [Makaranth MA](https://github.com/m4k4r4n7h)
+- [Rikshikesh M Sajeev](https://github.com/rishiosinter)
+- [Shweta Sagar Umachagi](https://github.com/shwetasagarumachagi-lgtm)
+- [Yadu Krishna](https://github.com/YADU-KRISHNA23)
+- [Vibhin Rathod](https://github.com/vibhinrathods-creator)
 
 ## What you get
 
@@ -334,10 +333,5 @@ It runs a zero-comment source scan, Python byte compilation, and the frontend Ty
 
 MIT. See `LICENSE`.
 markdown
-## Built by Team BRYVEN BROTHERS
-- [Makaranth MA](https://github.com/m4k4r4n7h)
-- [Rikshikesh M Sajeev](https://github.com/rishiosinter)
-- [Shweta Sagar Umachagi](https://github.com/shwetasagarumachagi-lgtm)
-- [Yadu Krishna](https://github.com/YADU-KRISHNA23)
-- [Vibhin Rathod](https://github.com/vibhinrathods-creator)
+
 
