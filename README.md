@@ -335,9 +335,9 @@ It runs a zero-comment source scan, Python byte compilation, and the frontend Ty
 MIT. See `LICENSE`.
 markdown
 ## Built by Team BRYVEN BROTHERS
-- **Makaranth MA** — [@m4k4r4n7h](https://github.com)
-- **Rikshikesh M Sajeev** — [@rishiosinter](https://github.com)
-- **Shweta Sagar Umachagi** — [@shwetasagarumachagi-lgtm](https://github.com)
-- **Yadu Krishna** — [@YADU-KRISHNA23](https://github.com)
-- **Vibhin Rathod** — [@vibhinrathods-creator](https://github.com)
+- [Makaranth MA](https://github.com/m4k4r4n7h)
+- [Rikshikesh M Sajeev](https://github.com/rishiosinter)
+- [Shweta Sagar Umachagi](https://github.com/shwetasagarumachagi-lgtm)
+- [Yadu Krishna](https://github.com/YADU-KRISHNA23)
+- [Vibhin Rathod](https://github.com/vibhinrathods-creator)
 
